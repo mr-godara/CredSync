@@ -432,8 +432,19 @@ const swaggerDocument = {
 };
 
 export function setupSwagger(app: Express): void {
+  const port = process.env.PORT || "5000";
+  const renderUrl = process.env.RENDER_EXTERNAL_URL;
+  const baseUrl = renderUrl || process.env.PUBLIC_URL || `http://localhost:${port}`;
+
+  swaggerDocument.servers = [
+    {
+      url: baseUrl,
+      description: renderUrl ? "Render" : "Local Dev Server",
+    },
+  ];
+
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
     customSiteTitle: "LMS API Docs",
   }));
-  console.log("Swagger docs available at http://localhost:5000/api-docs");
+  console.log(`Swagger docs available at ${baseUrl}/api-docs`);
 }
