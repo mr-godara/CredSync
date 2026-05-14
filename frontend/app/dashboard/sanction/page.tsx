@@ -75,6 +75,9 @@ export default function SanctionDashboard() {
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F7F1E8]">Loading...</div>;
 
+  const envUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://CredSync-zknl.onrender.com";
+  const backendUrl = envUrl.replace(/\/$/, "");
+
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "#F7F1E8" }}>
       {/* Top Navbar */}
@@ -118,12 +121,18 @@ export default function SanctionDashboard() {
               No pending applications to review.
             </div>
           ) : (
-            loans.map((loan) => (
+            loans.map((loan) => {
+              const borrowerName = loan.borrower?.name || "Unknown Borrower";
+              const borrowerEmail = loan.borrower?.email || "Unknown Email";
+              const slipPath = loan.salarySlipUrl || loan.borrower?.salarySlipUrl || "";
+              const slipUrl = slipPath ? (slipPath.startsWith("http") ? slipPath : `${backendUrl}${slipPath}`) : "";
+
+              return (
               <div key={loan._id} style={{ background: "#FFFCF7", border: "1px solid #E2D2BE", borderRadius: "16px", padding: "24px", boxShadow: "0 4px 20px rgba(27,26,22,0.03)" }}>
                 <div className="flex justify-between items-start mb-6">
                   <div>
-                    <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1B1A16" }}>{loan.borrower.name}</h3>
-                    <p style={{ fontSize: "14px", color: "#7B6E61" }}>{loan.borrower.email}</p>
+                    <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1B1A16" }}>{borrowerName}</h3>
+                    <p style={{ fontSize: "14px", color: "#7B6E61" }}>{borrowerEmail}</p>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <p style={{ fontSize: "12px", fontWeight: 700, color: "#7B6E61", textTransform: "uppercase", letterSpacing: "0.05em" }}>Requested Amount</p>
@@ -146,7 +155,11 @@ export default function SanctionDashboard() {
                   </div>
                   <div>
                     <p style={{ fontSize: "12px", color: "#7B6E61", fontWeight: 600, marginBottom: "2px" }}>Salary Slip</p>
-                    <a href={`http://localhost:5000${loan.borrower.salarySlipUrl}`} target="_blank" rel="noreferrer" style={{ fontSize: "14px", color: "#C08B2D", fontWeight: 600, textDecoration: "underline" }}>View Document</a>
+                    {slipUrl ? (
+                      <a href={slipUrl} target="_blank" rel="noreferrer" style={{ fontSize: "14px", color: "#C08B2D", fontWeight: 600, textDecoration: "underline" }}>View Document</a>
+                    ) : (
+                      <span style={{ fontSize: "13px", color: "#7B6E61" }}>Not uploaded</span>
+                    )}
                   </div>
                 </div>
 
@@ -165,7 +178,8 @@ export default function SanctionDashboard() {
                   </button>
                 </div>
               </div>
-            ))
+            );
+            })
           )}
         </div>
       </main>
