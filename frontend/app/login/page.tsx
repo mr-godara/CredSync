@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { login } from "@/lib/api";
+import { login, setAuthToken } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,6 +25,9 @@ export default function LoginPage() {
     try {
       const res  = await login(form);
       const role = res.data.user.role as string;
+      if (res.data.token) {
+        setAuthToken(res.data.token);
+      }
 
       toast.success(`Welcome back, ${res.data.user.name}!`);
 

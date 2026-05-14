@@ -9,6 +9,27 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+const getStoredToken = () => {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem("auth_token");
+};
+
+export const setAuthToken = (token?: string | null) => {
+  if (typeof window === "undefined") return;
+  if (token) {
+    window.localStorage.setItem("auth_token", token);
+    api.defaults.headers.common.Authorization = `Bearer ${token}`;
+  } else {
+    window.localStorage.removeItem("auth_token");
+    delete api.defaults.headers.common.Authorization;
+  }
+};
+
+const existingToken = getStoredToken();
+if (existingToken) {
+  api.defaults.headers.common.Authorization = `Bearer ${existingToken}`;
+}
+
 // ── Auth ──────────────────────────────────────────────────────────────────────
 export const register = (data: { name: string; email: string; password: string }) =>
   api.post("/auth/register", data);
@@ -16,8 +37,13 @@ export const register = (data: { name: string; email: string; password: string }
 export const login = (data: { email: string; password: string }) =>
   api.post("/auth/login", data);
 
-export const logout = () =>
-  api.post("/auth/logout");
+export const logout = async () => {
+  try {
+    await api.post("/auth/logout");
+  } finally {
+    setAuthToken(null);
+  }
+};
 
 export const getMe = () =>
   api.get("/auth/me");
