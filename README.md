@@ -11,7 +11,7 @@ The system is built using a modern technology stack:
 - Backend: Node.js, Express, TypeScript
 - Database: MongoDB
 
-**API Documentation:** [https://CredSync-zknl.onrender.com/api-docs](https://CredSync-zknl.onrender.com/api-docs)
+**API Documentation:** [(https://credsync-backend.onrender.com/api-docs)](https://credsync-backend.onrender.com/api-docs))
 
 ## Folder Structure
 
